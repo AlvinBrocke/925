@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import ShiftLog from '../components/ShiftLog.astro';
+import Newsletter from '../components/Newsletter.astro';
+import Footer from '../components/Footer.astro';
+import ClockInDialog from '../components/ClockInDialog';
+---
+<Base
+  title="925 — The Shift Continues"
+  description="The workday ends. The real shift starts. Location drops 24hrs before doors — after hours, on time."
+>
+  <Header />
+  <main>
+    <Hero />
+    <ShiftLog />
+    <Newsletter />
+  </main>
+  <Footer />
+
+  <!-- client:idle — nobody opens the dialog in the first 200ms, so it waits
+       until the main thread is free rather than competing with first paint. -->
+  <ClockInDialog client:idle />
+</Base>

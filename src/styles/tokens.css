@@ -1,0 +1,68 @@
+/* Verbatim from the design system's tokens/{colors,typography,spacing}.css.
+   tokens/fonts.css is deliberately not carried over: it @imports Google Fonts
+   over the network, which is a render-blocking round trip. The families are
+   self-hosted via @fontsource in Base.astro instead. */
+:root{
+--black:#000000;
+--near-black:#0a0a0a;
+--charcoal:#161616;
+--charcoal-2:#1f1f1f;
+--chrome-100:#f4f6f6;
+--chrome-300:#c9d2d1;
+--chrome-500:#8d9998;
+--chrome-700:#4c5453;
+--teal:#00d2c3;
+--teal-600:#00a89c;
+--teal-300:#5ce8dd;
+--teal-glow:#00d2c366;
+--white:#ffffff;
+--danger:#ff4d4d;
+--warn:#ffb02e;
+--duotone-green-deep:#0a1f16;
+--duotone-green:#173a2b;
+
+--surface-app:var(--black);
+--surface-raised:var(--charcoal);
+--surface-raised-2:var(--charcoal-2);
+--surface-overlay:#000000cc;
+--border-hairline:#ffffff1a;
+--border-strong:#ffffff33;
+
+--text-primary:var(--chrome-100);
+--text-secondary:var(--chrome-300);
+--text-muted:var(--chrome-700);
+--text-accent:var(--teal);
+--text-on-accent:#00120f;
+
+--accent:var(--teal);
+--accent-hover:var(--teal-300);
+--accent-active:var(--teal-600);
+--accent-contrast:#00120f;
+
+--font-display:'Orbitron',sans-serif;
+--font-body:'Rajdhani',sans-serif;
+--font-mono:'Share Tech Mono',monospace;
+
+--text-xs:12px;  --text-sm:14px;  --text-base:16px; --text-md:18px;
+--text-lg:22px;  --text-xl:28px;  --text-2xl:36px;  --text-3xl:48px;
+--text-4xl:72px; --text-5xl:104px;
+
+--tracking-tight:-0.01em; --tracking-normal:0;    --tracking-wide:0.04em;
+--tracking-wider:0.12em;  --tracking-widest:0.24em;
+
+--leading-tight:1.05; --leading-normal:1.4; --leading-relaxed:1.6;
+
+--space-1:4px;  --space-2:8px;  --space-3:12px; --space-4:16px; --space-5:24px;
+--space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px; --space-10:128px;
+
+--radius-sm:2px; --radius-md:4px; --radius-lg:8px; --radius-pill:999px;
+
+--shadow-glow-sm:0 0 12px var(--teal-glow);
+--shadow-glow-md:0 0 32px var(--teal-glow);
+--shadow-card:0 8px 24px #00000080;
+--shadow-hairline:inset 0 0 0 1px var(--border-hairline);
+
+--ease-standard:cubic-bezier(.4,0,.2,1);
+--duration-fast:120ms;
+--duration-base:220ms;
+}

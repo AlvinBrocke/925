@@ -1,0 +1,28 @@
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--black);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+}
+h1,h2,h3,p{margin:0}
+img{max-width:100%}
+a{color:inherit}
+
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+/* Replaces the `style-hover` attribute from the .dc.html template, which the DC
+   runtime never implemented — the card lift was dead in the design file. */
+.card-link{display:block;text-decoration:none;transition:transform var(--duration-base) var(--ease-standard)}
+.card-link:hover{transform:translateY(-6px)}
+
+.wrap{max-width:1240px;margin:0 auto}
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}

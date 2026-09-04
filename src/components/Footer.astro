@@ -1,0 +1,33 @@
+---
+import ChromeField from './ChromeField.astro';
+const year = new Date().getFullYear();
+---
+<footer class="foot">
+  <ChromeField field="footer" />
+  <p class="mark">© {year} 925 — THE SHIFT CONTINUES</p>
+  <div class="social">
+    <a href="https://instagram.com" aria-label="Instagram" rel="me noopener">IG</a>
+    <a href="https://x.com" aria-label="X" rel="me noopener">X</a>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    position: relative; overflow: hidden; padding: 40px;
+    border-top: 1px solid var(--border-hairline);
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+  }
+  .mark {
+    position: relative; z-index: 1; font-family: var(--font-mono);
+    font-size: var(--text-xs); color: var(--chrome-700); letter-spacing: var(--tracking-wide);
+  }
+  .social { position: relative; z-index: 1; display: flex; gap: 12px; }
+  .social a {
+    width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-hairline); border-radius: var(--radius-sm);
+    color: var(--chrome-300); text-decoration: none; font-family: var(--font-mono); font-size: 13px;
+    transition: all var(--duration-fast) var(--ease-standard);
+  }
+  .social a:hover { border-color: var(--teal); color: var(--teal); }
+  @media (max-width: 767px) { .foot { padding: 32px 20px; } }
+</style>

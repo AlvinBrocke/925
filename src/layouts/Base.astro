@@ -1,0 +1,50 @@
+---
+// Self-hosted, subset to the weights actually used. These replace the Google
+// Fonts @import in the design system's tokens/fonts.css — three families over
+// the network is a costly render-blocking round trip on mobile data.
+import '@fontsource/orbitron/500.css';
+import '@fontsource/orbitron/700.css';
+import '@fontsource/orbitron/900.css';
+import '@fontsource/rajdhani/400.css';
+import '@fontsource/rajdhani/600.css';
+import '@fontsource/share-tech-mono/400.css';
+
+import '../styles/tokens.css';
+import '../styles/global.css';
+import '../styles/chrome.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://925.example');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <slot />
+
+    <!-- The only inline script on the page. Every static "Clock In" button
+         dispatches one event; the single React dialog island listens for it.
+         This is what keeps four call-to-action buttons at zero hydration. -->
+    <script>
+      document.addEventListener('click', (e) => {
+        const trigger = (e.target as HTMLElement)?.closest('[data-clock-in]');
+        if (trigger) window.dispatchEvent(new CustomEvent('clock-in:open'));
+      });
+    </script>
+  </body>
+</html>

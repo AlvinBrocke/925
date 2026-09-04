@@ -1,0 +1,9 @@
+# esbuild links its native binary and sharp its libvips bindings during
+# postinstall. pnpm blocks build scripts by default, and without these two the
+# Vite build and astro:assets image optimization both fail. Approving them here
+# keeps `pnpm install` non-interactive, including on CI.
+allowBuilds:
+  esbuild: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - astro@7.3.1

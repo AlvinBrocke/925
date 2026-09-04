@@ -1,0 +1,61 @@
+---
+/**
+ * The floating chrome objects.
+ *
+ * Pure markup over chrome.css — no JavaScript, nothing to hydrate. Each section
+ * gets its own arrangement; `field` picks which. Objects tagged `cx-opt` are
+ * dropped on small screens (see the mobile pass in chrome.css).
+ */
+interface Props {
+  field: 'hero' | 'log' | 'cta' | 'footer';
+  class?: string;
+}
+const { field, class: className } = Astro.props;
+
+type Obj = { cls: string; style: string; opt?: boolean; spin?: string };
+
+const fields: Record<Props['field'], Obj[]> = {
+  hero: [
+    { cls: 'cx-wire',   style: 'top:50%;left:50%;width:580px;height:580px;margin:-290px 0 0 -290px;opacity:.4;animation:spinSlow 64s linear infinite', opt: true },
+    { cls: 'cx-sphere', style: 'top:5%;left:20%;width:170px;height:170px;opacity:.85;animation:floatA 11s ease-in-out infinite' },
+    { cls: 'cx-sphere', style: 'bottom:15%;right:21%;width:96px;height:96px;opacity:.75;animation:floatC 9s ease-in-out infinite;animation-delay:-3s' },
+    { cls: 'cx-sphere', style: 'top:37%;left:4%;width:54px;height:54px;opacity:.6;animation:floatD 13s ease-in-out infinite;animation-delay:-6s', opt: true },
+    { cls: 'cx-ring',   style: 'top:6%;right:20%;width:152px;height:152px;opacity:.8;animation:floatB 12s ease-in-out infinite', spin: 'spinSlow 26s linear infinite' },
+    { cls: 'cx-ring',   style: 'bottom:30%;left:24%;width:66px;height:66px;opacity:.55;animation:floatC 15s ease-in-out infinite;animation-delay:-4s', spin: 'spinRev 19s linear infinite', opt: true },
+    { cls: 'cx-cube',   style: 'bottom:13%;left:8%;width:124px;height:124px;opacity:.8;animation:floatE 10s ease-in-out infinite' },
+    { cls: 'cx-cube',   style: 'top:16%;right:32%;width:58px;height:58px;opacity:.5;animation:floatD 17s ease-in-out infinite;animation-delay:-8s', opt: true },
+    { cls: 'cx-trap',   style: 'top:44%;left:1%;width:132px;height:172px;opacity:.7;animation:floatB 14s ease-in-out infinite;animation-delay:-2s' },
+    { cls: 'cx-blade',  style: 'top:43%;right:5%;width:210px;height:46px;opacity:.75;animation:floatF 12s ease-in-out infinite' },
+    { cls: 'cx-blade',  style: 'top:70%;left:30%;width:150px;height:28px;opacity:.35;animation:floatF 16s ease-in-out infinite;animation-delay:-7s', opt: true },
+    { cls: 'cx-pill',   style: 'bottom:7%;left:37%;width:158px;height:26px;opacity:.6;animation:floatC 10s ease-in-out infinite;animation-delay:-5s', opt: true },
+    { cls: 'cx-hex',    style: 'top:3%;right:39%;width:78px;height:88px;opacity:.6;animation:floatA 15s ease-in-out infinite;animation-delay:-9s', opt: true },
+  ],
+  log: [
+    { cls: 'cx-sphere', style: 'top:-44px;right:5%;width:112px;height:112px;opacity:.45;z-index:0;animation:floatA 12s ease-in-out infinite' },
+    { cls: 'cx-trap',   style: 'bottom:8%;left:-34px;width:96px;height:126px;opacity:.35;z-index:0;animation:floatB 15s ease-in-out infinite;animation-delay:-4s', opt: true },
+    { cls: 'cx-ring',   style: 'bottom:4%;right:13%;width:84px;height:84px;opacity:.4;z-index:0;animation:floatD 18s ease-in-out infinite', spin: 'spinRev 30s linear infinite', opt: true },
+    { cls: 'cx-blade',  style: 'top:26%;left:18%;width:168px;height:34px;opacity:.22;z-index:0;animation:floatF 20s ease-in-out infinite;animation-delay:-6s', opt: true },
+    { cls: 'cx-cube',   style: 'top:8%;left:44%;width:52px;height:52px;opacity:.28;z-index:0;animation:floatE 16s ease-in-out infinite;animation-delay:-3s', opt: true },
+  ],
+  cta: [
+    { cls: 'cx-cube',   style: 'top:7%;right:6%;width:98px;height:98px;opacity:.6;z-index:0;animation:floatD 13s ease-in-out infinite' },
+    { cls: 'cx-sphere', style: 'bottom:-34px;left:13%;width:124px;height:124px;opacity:.55;z-index:0;animation:floatA 12s ease-in-out infinite;animation-delay:-5s' },
+    { cls: 'cx-ring',   style: 'top:28%;right:23%;width:68px;height:68px;opacity:.45;z-index:0;animation:floatC 17s ease-in-out infinite', spin: 'spinSlow 22s linear infinite', opt: true },
+    { cls: 'cx-pill',   style: 'bottom:16%;right:9%;width:128px;height:22px;opacity:.4;z-index:0;animation:floatF 14s ease-in-out infinite;animation-delay:-2s', opt: true },
+    { cls: 'cx-hex',    style: 'bottom:12%;left:38%;width:60px;height:68px;opacity:.3;z-index:0;animation:floatE 19s ease-in-out infinite;animation-delay:-8s', opt: true },
+  ],
+  footer: [
+    { cls: 'cx-sphere', style: 'top:-22px;right:7%;width:66px;height:66px;opacity:.4;z-index:0;animation:floatC 11s ease-in-out infinite' },
+    { cls: 'cx-blade',  style: 'top:26%;left:31%;width:126px;height:22px;opacity:.2;z-index:0;animation:floatF 18s ease-in-out infinite;animation-delay:-5s', opt: true },
+  ],
+};
+
+const objects = fields[field];
+---
+{objects.map((o) => (
+  o.spin
+    ? <div class:list={['cx', o.opt && 'cx-opt', className]} style={o.style} aria-hidden="true">
+        <div class={o.cls} style={`animation:${o.spin}`}></div>
+      </div>
+    : <div class:list={['cx', o.cls, o.opt && 'cx-opt', className]} style={o.style} aria-hidden="true"></div>
+))}

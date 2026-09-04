@@ -1,0 +1,42 @@
+---
+import ChromeField from './ChromeField.astro';
+import { nextShift } from '../data/shift';
+---
+<section class="cta" id="manifesto">
+  <ChromeField field="cta" />
+
+  <div class="inner">
+    <h2>Get The Drop First</h2>
+    <p>
+      Location drops {nextShift.revealHoursBefore}hrs before doors. Clock in to
+      get it before anyone else.
+    </p>
+    <button class="btn-primary" data-clock-in>Clock In</button>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative; padding: 70px 40px; overflow: hidden;
+    background: linear-gradient(180deg, #000, var(--duotone-green-deep) 60%, #000);
+  }
+  .inner {
+    position: relative; z-index: 1; max-width: 520px; margin: 0 auto; text-align: center;
+    display: flex; flex-direction: column; gap: var(--space-4); align-items: center;
+  }
+  h2 {
+    font-family: var(--font-display); font-size: var(--text-xl);
+    text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  }
+  p { color: var(--chrome-300); font-size: 15px; }
+  .btn-primary {
+    font-family: var(--font-display); font-weight: 700; font-size: 15px;
+    letter-spacing: var(--tracking-wider); text-transform: uppercase;
+    padding: 12px 24px; border: 1px solid transparent; border-radius: var(--radius-sm);
+    background: var(--accent); color: var(--accent-contrast);
+    box-shadow: var(--shadow-glow-sm); cursor: pointer;
+    transition: all var(--duration-base) var(--ease-standard);
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  @media (max-width: 767px) { .cta { padding: 48px 20px; } }
+</style>
