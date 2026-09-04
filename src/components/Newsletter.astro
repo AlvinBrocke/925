@@ -1,24 +1,44 @@
 ---
 import ChromeField from './ChromeField.astro';
 import { nextShift } from '../data/shift';
+import { PASSA_CHECKOUT_URL } from '../data/tickets';
 ---
 <section class="cta" id="manifesto">
   <ChromeField field="cta" />
 
-  <div class="inner">
+  <div class="wash" aria-hidden="true"></div>
+
+  <div class="inner" data-reveal>
     <h2>Get The Drop First</h2>
     <p>
       Location drops {nextShift.revealHoursBefore}hrs before doors. Clock in to
       get it before anyone else.
     </p>
     <button class="btn-primary" data-clock-in>Clock In</button>
+    <!-- The last block on the page is the last chance to sell a ticket, but the
+         address list is what this section is for — so tickets go out as a link,
+         not a second primary button competing with the one above it. -->
+    <p class="also">
+      No ticket yet?
+      <a href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">Get yours on Passa →</a>
+    </p>
   </div>
 </section>
 
 <style>
   .cta {
-    position: relative; padding: 70px 40px; overflow: hidden;
+    /* clip, not hidden: `hidden` would make this a scroll
+       container and swallow the view() timeline of the reveal inside it. */
+    position: relative; padding: 70px 40px; overflow: clip;
     background: linear-gradient(180deg, #000, var(--duotone-green-deep) 60%, #000);
+  }
+  /* Subtle teal wash behind the block, lifted from the reference site. It sits
+     over the section gradient and under the content. */
+  .wash {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%, #00d2c31f 0%, #00d2c30a 45%, transparent 74%),
+      radial-gradient(circle at 12% 108%, #00d2c31a 0%, transparent 52%);
   }
   .inner {
     position: relative; z-index: 1; max-width: 520px; margin: 0 auto; text-align: center;
@@ -38,5 +58,11 @@ import { nextShift } from '../data/shift';
     transition: all var(--duration-base) var(--ease-standard);
   }
   .btn-primary:hover { background: var(--accent-hover); }
+  .also {
+    font-family: var(--font-mono); font-size: 13px; color: var(--chrome-500);
+    letter-spacing: var(--tracking-wide);
+  }
+  .also a { color: var(--teal); text-decoration: none; }
+  .also a:hover { text-decoration: underline; }
   @media (max-width: 767px) { .cta { padding: 48px 20px; } }
 </style>

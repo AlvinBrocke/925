@@ -2,10 +2,40 @@
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import ShiftLog from '../components/ShiftLog.astro';
+import Tickets from '../components/Tickets.astro';
+import Gallery from '../components/Gallery.astro';
 import Newsletter from '../components/Newsletter.astro';
 import Footer from '../components/Footer.astro';
 import ClockInDialog from '../components/ClockInDialog';
+import { nextShift } from '../data/shift';
+import { CURRENCY, PASSA_CHECKOUT_URL, ticketsAvailable, tiers } from '../data/tickets';
+
+/** Event schema, so the drop is machine-readable and the ticket link travels
+ *  with it — a shared link, a search result and an assistant answering "where
+ *  do I buy" all end up pointing at Passa rather than at a dead flyer. The
+ *  address is deliberately absent: only the venue name is public before the
+ *  reveal, and schema.org is happy with a named place and no street. */
+const cheapest = Math.min(...tiers.filter((t) => !t.soldOut).map((t) => t.price));
+const eventSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: `925: ${nextShift.title}`,
+  startDate: nextShift.doorsAt,
+  endDate: nextShift.endsAt,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@type': 'Place', name: nextShift.venue, address: 'Accra, Ghana' },
+  organizer: { '@type': 'Organization', name: '925', url: 'https://passa.live/creator/925' },
+  offers: {
+    '@type': 'Offer',
+    url: PASSA_CHECKOUT_URL,
+    price: cheapest,
+    priceCurrency: CURRENCY,
+    availability: ticketsAvailable
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/SoldOut',
+  },
+};
 ---
 <Base
   title="925 — The Shift Continues"
@@ -14,7 +44,8 @@ import ClockInDialog from '../components/ClockInDialog';
   <Header />
   <main>
     <Hero />
-    <ShiftLog />
+    <Tickets />
+    <Gallery />
     <Newsletter />
   </main>
   <Footer />
@@ -22,4 +53,6 @@ import ClockInDialog from '../components/ClockInDialog';
   <!-- client:idle — nobody opens the dialog in the first 200ms, so it waits
        until the main thread is free rather than competing with first paint. -->
   <ClockInDialog client:idle />
+
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(eventSchema)} />
 </Base>

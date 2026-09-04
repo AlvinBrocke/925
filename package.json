@@ -12,9 +12,9 @@
   "dependencies": {
     "@astrojs/react": "^6.0.5",
     "@astrojs/vercel": "^11.0.10",
-    "@fontsource/orbitron": "^5.1.0",
-    "@fontsource/rajdhani": "^5.1.0",
-    "@fontsource/share-tech-mono": "^5.1.0",
+    "@fontsource-variable/archivo": "^5.2.9",
+    "@fontsource-variable/inter": "^5.2.6",
+    "@fontsource-variable/jetbrains-mono": "^5.2.6",
     "astro": "^7.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

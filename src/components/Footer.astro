@@ -1,19 +1,22 @@
 ---
 import ChromeField from './ChromeField.astro';
+import { socials } from '../data/socials';
 const year = new Date().getFullYear();
 ---
 <footer class="foot">
   <ChromeField field="footer" />
-  <p class="mark">© {year} 925 — THE SHIFT CONTINUES</p>
-  <div class="social">
-    <a href="https://instagram.com" aria-label="Instagram" rel="me noopener">IG</a>
-    <a href="https://x.com" aria-label="X" rel="me noopener">X</a>
+  <p class="mark" data-reveal>© {year} 925 — THE SHIFT CONTINUES</p>
+  <div class="social" data-reveal style="--reveal-i:1">
+    {socials.map((s) => (
+      <a href={s.href} aria-label={s.name} rel="me noopener">{s.label}</a>
+    ))}
   </div>
 </footer>
 
 <style>
   .foot {
-    position: relative; overflow: hidden; padding: 40px;
+    /* clip, not hidden — see Tickets.astro, which has the full rationale. */
+    position: relative; overflow: clip; padding: 40px;
     border-top: 1px solid var(--border-hairline);
     display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
   }

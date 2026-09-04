@@ -1,0 +1,154 @@
+---
+import ChromeField from './ChromeField.astro';
+import { nextShift } from '../data/shift';
+import { PASSA_CHECKOUT_URL, PASSA_DROP_URL, formatPrice, tiers } from '../data/tickets';
+
+/** Doors and last call, formatted off the one date in shift.ts so this block
+ *  can never drift from the countdown above it. Accra is GMT+0 year round, so
+ *  UTC is the local wall clock — no timezone conversion to get wrong. */
+const utc = (iso: string, opts: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(new Date(iso));
+
+const dayLine = utc(nextShift.doorsAt, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+/** en-GB renders "9 pm"; the board is set in uppercase mono where the space
+ *  reads as a gap rather than a time, so close it up to "9PM". */
+const hour = (iso: string) =>
+  utc(iso, { hour: 'numeric', hour12: true }).replace(/\s+/g, '');
+const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
+---
+<section class="tickets" id="tickets">
+  <ChromeField field="log" />
+
+  <div class="inner wrap">
+    <header class="head" data-reveal>
+      <p class="eyebrow">— Badge in. Attendance is not optional. —</p>
+      <h2>Get Your Badge</h2>
+      <p class="when">{dayLine} · {hourLine} · {nextShift.venue}</p>
+    </header>
+
+    <!-- Every open tier is a link straight into Passa's tier picker. Sold-out
+         ones stay on the board as plain <div>s — the ladder is the pitch, and a
+         closed door should not be focusable or announced as a link. The state
+         is carried by the "Sold Out" text, not by ARIA on a non-interactive
+         element, so it survives with styles off. -->
+    <ol class="grid">
+      {tiers.map((tier, i) => {
+        const Card = tier.soldOut ? 'div' : 'a';
+        return (
+        <li data-reveal style={`--reveal-i:${i}`}>
+          <Card
+            class:list={['tier', { out: tier.soldOut }]}
+            href={tier.soldOut ? undefined : PASSA_CHECKOUT_URL}
+            target={tier.soldOut ? undefined : '_blank'}
+            rel={tier.soldOut ? undefined : 'noopener noreferrer'}
+          >
+            <span class="grade">{tier.soldOut ? 'Position Filled' : tier.label}</span>
+            <span class="name">{tier.name}</span>
+            <span class="price">{formatPrice(tier)}</span>
+            <span class="admits">Admits {tier.admits}</span>
+            <span class="pick">{tier.soldOut ? 'Sold Out' : 'Select →'}</span>
+          </Card>
+        </li>
+        );
+      })}
+    </ol>
+
+    <div class="foot" data-reveal>
+      <a class="btn btn-primary" href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
+        Get Tickets
+      </a>
+      <p class="note">
+        Checkout is handled by <a href={PASSA_DROP_URL} target="_blank" rel="noopener noreferrer">Passa</a>,
+        where prices and availability are live. All tickets non-refundable.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* clip, not hidden: `hidden` would make this section a scroll container and
+     every view()-driven reveal inside it would be measured against a box that
+     never scrolls. Clips identically. */
+  .tickets { padding: 70px 40px; position: relative; overflow: clip; }
+  .inner { position: relative; z-index: 1; }
+
+  .head { text-align: center; display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: 36px; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: var(--text-xs);
+    letter-spacing: var(--tracking-widest); color: var(--teal); text-transform: uppercase;
+  }
+  h2 {
+    font-family: var(--font-display); font-size: var(--text-xl);
+    text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  }
+  .when {
+    font-family: var(--font-mono); font-size: 13px; color: var(--chrome-500);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  }
+
+  .grid {
+    list-style: none; display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .tier {
+    display: flex; flex-direction: column; gap: 6px; height: 100%;
+    padding: 22px 20px 20px; text-decoration: none;
+    background: var(--surface-raised); border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-base) var(--ease-standard),
+                box-shadow var(--duration-base) var(--ease-standard),
+                translate var(--duration-base) var(--ease-standard);
+  }
+  a.tier:hover, a.tier:focus-visible {
+    border-color: var(--teal); box-shadow: var(--shadow-glow-sm); translate: 0 -2px;
+  }
+  .grade {
+    font-family: var(--font-mono); font-size: 11px; color: var(--teal);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  }
+  .name {
+    font-family: var(--font-display); font-weight: 700; font-size: var(--text-md);
+    color: var(--chrome-100); text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  }
+  .price {
+    font-family: var(--font-mono); font-size: var(--text-lg); color: var(--chrome-100);
+    letter-spacing: var(--tracking-wide); margin-top: var(--space-2);
+  }
+  .admits { font-family: var(--font-body); font-size: 13px; color: var(--chrome-500); }
+  .pick {
+    font-family: var(--font-display); font-weight: 700; font-size: 13px;
+    letter-spacing: var(--tracking-wider); text-transform: uppercase;
+    color: var(--teal); margin-top: auto; padding-top: var(--space-4);
+  }
+
+  /* Sold out reads as a filled position, not an error: the card recedes rather
+     than shouting, and the whole thing stops being interactive. */
+  .tier.out { opacity: .5; }
+  .tier.out .grade, .tier.out .price { color: var(--chrome-500); }
+  .tier.out .name { color: var(--chrome-300); }
+  .tier.out .price { text-decoration: line-through; }
+  .tier.out .pick { color: var(--chrome-700); }
+
+  .foot {
+    margin-top: 34px; display: flex; flex-direction: column;
+    align-items: center; gap: var(--space-4); text-align: center;
+  }
+  .btn {
+    font-family: var(--font-display); font-weight: 700; font-size: 17px;
+    letter-spacing: var(--tracking-wider); text-transform: uppercase;
+    padding: 16px 32px; border: 1px solid transparent; border-radius: var(--radius-sm);
+    text-decoration: none; display: inline-block;
+    transition: background var(--duration-base) var(--ease-standard);
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-contrast); box-shadow: var(--shadow-glow-sm); }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .note { font-size: 13px; color: var(--chrome-500); max-width: 420px; }
+  .note a { color: var(--chrome-300); }
+  .note a:hover { color: var(--teal); }
+
+  @media (max-width: 767px) {
+    .tickets { padding: 48px 20px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tier { padding: 18px 16px 16px; }
+  }
+</style>

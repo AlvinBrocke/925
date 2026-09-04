@@ -1,13 +1,13 @@
 ---
-// Self-hosted, subset to the weights actually used. These replace the Google
-// Fonts @import in the design system's tokens/fonts.css — three families over
-// the network is a costly render-blocking round trip on mobile data.
-import '@fontsource/orbitron/500.css';
-import '@fontsource/orbitron/700.css';
-import '@fontsource/orbitron/900.css';
-import '@fontsource/rajdhani/400.css';
-import '@fontsource/rajdhani/600.css';
-import '@fontsource/share-tech-mono/400.css';
+// Self-hosted, variable-axis builds. These replace the Google Fonts @import in
+// the design system's tokens/fonts.css — three families over the network is a
+// costly render-blocking round trip on mobile data. Each import is a single
+// variable-font file per unicode subset (weight axis only), so every weight
+// tokens.css/components ask for (display 600-800, body 400/500, mono 400) is
+// served from the one file instead of one static file per weight.
+import '@fontsource-variable/archivo';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
 
 import '../styles/tokens.css';
 import '../styles/global.css';
@@ -35,16 +35,135 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://925.example
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
+    <!-- Decorative scroll indicator, filled entirely by CSS off the root scroll
+         timeline. Styled in global.css, where it hides itself on browsers that
+         cannot drive it and under reduced motion. -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+
     <slot />
 
-    <!-- The only inline script on the page. Every static "Clock In" button
-         dispatches one event; the single React dialog island listens for it.
-         This is what keeps four call-to-action buttons at zero hydration. -->
+    <!-- The only inline script on the page. Three jobs, all delegated or
+         page-wide so nothing here scales with the number of elements:
+         the Clock In buttons, the reveal-on-scroll observer, and the hero
+         video. Keeping them in one module is what keeps the site at two
+         hydrated React islands and no third bundle. -->
     <script>
+      // Every static "Clock In" button dispatches one event; the single React
+      // dialog island listens for it. This is what keeps four call-to-action
+      // buttons at zero hydration.
       document.addEventListener('click', (e) => {
         const trigger = (e.target as HTMLElement)?.closest('[data-clock-in]');
         if (trigger) window.dispatchEvent(new CustomEvent('clock-in:open'));
       });
+
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // --- Reveal on scroll ------------------------------------------------
+      // Fallback only. Where the browser has scroll-driven animations,
+      // global.css does this on the compositor and bound to actual scroll
+      // position, which both looks better and costs nothing — so the observer
+      // stands down entirely rather than racing the CSS for the same elements.
+      // One observer for the whole page otherwise. Elements are unobserved once
+      // revealed, so this settles to zero work after the first pass.
+      const cssDriven =
+        CSS.supports('animation-timeline: view()') && !reduceMotion;
+      const revealables = cssDriven
+        ? ([] as HTMLElement[])
+        : document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (revealables.length) {
+        if (reduceMotion || !('IntersectionObserver' in window)) {
+          revealables.forEach((el) => el.classList.add('is-in'));
+        } else {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                // `bottom <= 0` covers a page opened directly at an anchor: the
+                // element is already scrolled past, so it must not stay hidden.
+                // No negative bottom rootMargin here — it would carve out a
+                // band at the end of the document that the last elements can
+                // never leave, and the footer would never reveal at all.
+                if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) continue;
+                entry.target.classList.add('is-in');
+                observer.unobserve(entry.target);
+              }
+            },
+            { threshold: 0.12 },
+          );
+          revealables.forEach((el) => observer.observe(el));
+        }
+      }
+
+      // --- Hero video ------------------------------------------------------
+      // The element ships with no `src`. It only gets one on a client that is
+      // wide, motion-tolerant and not asking us to save data — everyone else
+      // keeps the poster still and downloads no video at all, which is the
+      // whole point of the mobile-data budget.
+      const heroVideo = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+      const hero = document.querySelector<HTMLElement>('[data-hero]');
+      const saveData = (navigator as Navigator & {
+        connection?: { saveData?: boolean };
+      }).connection?.saveData === true;
+      const narrow = matchMedia('(max-width: 767px)').matches;
+
+      if (heroVideo && hero && !reduceMotion && !saveData && !narrow) {
+        const source = heroVideo.dataset.src;
+        let duration = 0;
+        let scrubbing = false;
+        let queued = false;
+
+        // Autoplay loop is the fallback: used when the file cannot be seeked
+        // quickly enough to scrub against, or reports no usable duration.
+        const loop = () => {
+          scrubbing = false;
+          heroVideo.loop = true;
+          heroVideo.play().catch(() => { /* poster stays; nothing else to do */ });
+        };
+
+        const scrub = () => {
+          if (!scrubbing || queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            const box = hero.getBoundingClientRect();
+            const progress = Math.min(1, Math.max(0, -box.top / Math.max(1, box.height)));
+            const t = progress * (duration - 0.05);
+            // Sub-frame seeks are wasted work and make the decoder thrash.
+            if (Math.abs(heroVideo.currentTime - t) > 0.03) heroVideo.currentTime = t;
+          });
+        };
+
+        heroVideo.addEventListener('loadedmetadata', () => {
+          duration = Number.isFinite(heroVideo.duration) ? heroVideo.duration : 0;
+          if (duration < 0.2) return loop();
+
+          // Probe one seek before committing to scrubbing. A file muxed without
+          // frequent keyframes will seek slowly enough to feel broken; better to
+          // find that out once here than on every scroll event.
+          const started = performance.now();
+          const settle = window.setTimeout(() => {
+            heroVideo.removeEventListener('seeked', onSeeked);
+            loop();
+          }, 600);
+          const onSeeked = () => {
+            heroVideo.removeEventListener('seeked', onSeeked);
+            clearTimeout(settle);
+            if (performance.now() - started > 400) return loop();
+            scrubbing = true;
+            scrub();
+          };
+          heroVideo.addEventListener('seeked', onSeeked);
+          heroVideo.currentTime = Math.min(0.1, duration / 10);
+        });
+
+        // A missing or undecodable file is a normal state here: the poster is
+        // already painted, so there is nothing to clean up.
+        heroVideo.addEventListener('error', () => { scrubbing = false; });
+
+        addEventListener('scroll', scrub, { passive: true });
+        addEventListener('resize', scrub, { passive: true });
+
+        if (source) heroVideo.src = source;
+      }
     </script>
   </body>
 </html>

@@ -1,26 +1,36 @@
 ---
-import { Image } from 'astro:assets';
 import ChromeField from './ChromeField.astro';
 import Countdown from './Countdown';
-import logoMark from '../assets/logo-mark-vertical.png';
-import lockup from '../assets/social-logo-lockup.png';
 import { nextShift, revealAt } from '../data/shift';
+import { PASSA_CHECKOUT_URL } from '../data/tickets';
+import { socials } from '../data/socials';
 
 const opensAt = revealAt(nextShift).toISOString();
 ---
-<section class="hero" id="on-shift">
-  <div class="bg" aria-hidden="true"></div>
+<section class="hero" id="on-shift" data-hero>
+  <!-- The clock is the hero's subject. The <video> ships with no `src`: the one
+       inline script in Base.astro attaches it only on a wide, motion-tolerant,
+       non-save-data client. Everywhere else the poster still is the hero, which
+       is also exactly the mobile-data path this site is built around. -->
+  <div class="bg" aria-hidden="true">
+    <video
+      class="bg-video"
+      data-hero-video
+      data-src="/video/hero-clock.mp4"
+      poster="/images/hero-clock.png"
+      muted
+      playsinline
+      preload="metadata"
+    ></video>
+  </div>
+  <div class="vignette" aria-hidden="true"></div>
   <div class="scan" aria-hidden="true"></div>
 
   <ChromeField field="hero" />
 
-  <Image src={logoMark} alt="" aria-hidden="true" class="mark mark-a" width={130} densities={[1, 2]} />
-  <Image src={logoMark} alt="" aria-hidden="true" class="mark mark-b" width={100} densities={[1, 2]} />
-  <Image src={lockup} alt="" aria-hidden="true" class="mark mark-c" width={180} densities={[1, 2]} />
-
   <div class="content">
     <p class="eyebrow">— A cultural override. clock in. —</p>
-    <h1>THE SHIFT<br />CONTINUES</h1>
+    <h1><span class="chrome-word">THE SHIFT</span><br /><span class="teal-word">CONTINUES</span></h1>
     <p class="lede">
       The workday ends. The real shift starts. Location drops when the clock hits
       zero — after hours, on time.
@@ -30,29 +40,59 @@ const opensAt = revealAt(nextShift).toISOString();
          is on screen, and it is above the fold. -->
     <Countdown client:load revealAt={opensAt} />
 
+    <!-- Tickets are the primary action now that the drop is on sale; Clock In
+         keeps its place beside it because the address still only reaches the
+         list. Two buttons, not three — a third wraps to its own line on a
+         phone and the primary stops looking primary. -->
     <div class="actions">
-      <button class="btn btn-primary" data-clock-in>Clock In</button>
-      <a class="btn btn-ghost" href="#shift-log">See Lineup</a>
+      <a class="btn btn-primary" href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
+        Get Tickets
+      </a>
+      <button class="btn btn-ghost" data-clock-in>Clock In</button>
     </div>
-    <p class="handle">@925</p>
+
+    <!-- "@925" was never a real handle — nobody could tap it and land
+         anywhere. These do. -->
+    <div class="socials">
+      {socials.map((s) => (
+        <a href={s.href} aria-label={s.name} rel="me noopener">{s.label}</a>
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
   .hero {
-    position: relative; min-height: 760px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; overflow: hidden; padding: 60px 20px;
+    position: relative; min-height: min(100svh, 900px); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; overflow: clip; padding: 60px 20px 96px;
+    /* Arched bottom edge, lifted from the reference site. overflow:hidden means
+       the video and the scrims are clipped by it too, not just the background. */
+    border-bottom-left-radius: 50% 92px;
+    border-bottom-right-radius: 50% 92px;
+    border-bottom: 1px solid var(--border-hairline);
   }
-  .bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 20%, var(--duotone-green-deep), #000 65%); }
+  .bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 44%, var(--duotone-green-deep), #000 68%); }
+  .bg-video {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: 50% 50%;
+    transform: scale(1.2);
+    filter: contrast(1.12) brightness(1.14);
+  }
+  /* The clock keeps its own contrast — the only real darkening is a soft patch
+     behind the headline, plus an edge vignette and a fade into the section
+     below. Anything heavier and the chrome stops reading as metal. */
+  .vignette {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 52% 42% at 50% 33%, #000000cc 0%, #0000008c 56%, transparent 84%),
+      radial-gradient(circle at 50% 46%, transparent 48%, #000000a6 100%),
+      linear-gradient(180deg, #000000b3 0%, transparent 20%, transparent 68%, #000 100%);
+  }
   .scan {
-    position: absolute; inset: 0; opacity: .14;
+    position: absolute; inset: 0; opacity: .1;
     background-image: repeating-linear-gradient(0deg, var(--teal) 0px, var(--teal) 1px, transparent 1px, transparent 4px);
     animation: scan 6s linear infinite;
   }
-  .hero :global(.mark) { position: absolute; z-index: 1; height: auto; }
-  .hero :global(.mark-a) { top: 8%; left: 6%; filter: drop-shadow(0 0 24px var(--teal-glow)); animation: floatA 7s ease-in-out infinite; }
-  .hero :global(.mark-b) { bottom: 10%; right: 8%; filter: drop-shadow(0 0 20px var(--teal-glow)); animation: floatB 8s ease-in-out infinite; }
-  .hero :global(.mark-c) { top: 14%; right: 5%; opacity: .9; filter: drop-shadow(0 0 18px #00000099); animation: floatC 9s ease-in-out infinite; }
 
   .content {
     position: relative; z-index: 2; text-align: center;
@@ -64,8 +104,15 @@ const opensAt = revealAt(nextShift).toISOString();
   }
   h1 {
     font-family: var(--font-display); font-weight: 900; font-size: var(--text-5xl);
-    line-height: .95; letter-spacing: .02em; text-shadow: 0 0 40px #00d2c344;
+    line-height: .95; letter-spacing: var(--tracking-tight);
   }
+  /* Two-tone: the first line is polished metal, the second is the brand accent. */
+  .chrome-word {
+    background: linear-gradient(180deg, #ffffff 0%, var(--chrome-300) 34%, var(--chrome-500) 54%, #ffffff 72%, var(--chrome-500) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .teal-word { color: var(--teal); text-shadow: 0 0 44px var(--teal-glow); }
   .lede { font-size: var(--text-md); color: var(--chrome-300); max-width: 520px; }
   .actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: var(--space-2); }
   .btn {
@@ -79,12 +126,48 @@ const opensAt = revealAt(nextShift).toISOString();
   .btn-primary:hover { background: var(--accent-hover); }
   .btn-ghost { background: transparent; color: var(--chrome-100); border-color: var(--border-hairline); }
   .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
-  .handle { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--chrome-700); letter-spacing: .1em; }
+  .socials { display: flex; gap: 10px; }
+  .socials a {
+    width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-hairline); border-radius: var(--radius-sm);
+    color: var(--chrome-500); text-decoration: none; font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: var(--tracking-wide);
+    transition: all var(--duration-fast) var(--ease-standard);
+  }
+  .socials a:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* The headline lags the page. Scrolling moves the hero up by S while this
+     block is pushed back down by ~0.25S, so it drifts out of frame slower than
+     everything around it and the clock behind it reads as being further away.
+     Paired with a fade, so the countdown is gone rather than fighting the
+     section below it for attention.
+
+     Bound to scroll(root), not view(): the hero clips its own overflow, and a
+     view() timeline on a child of a clipping box is the one case where the two
+     features interact badly. The range is in vh so it tracks the hero's own
+     height, which is also expressed in viewport units. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .content {
+        animation: heroSink linear both;
+        animation-timeline: scroll(root block);
+        /* Holds for the first 14vh before it starts to go. Without the hold
+           the countdown is already half-faded while it is still centre-screen,
+           so a small nudge of the wheel dims the one thing a first-time
+           visitor came to read. */
+        animation-range: 14vh 82vh;
+      }
+    }
+  }
+  @keyframes heroSink {
+    from { opacity: 1; translate: 0 0; }
+    to   { opacity: .1; translate: 0 64px; }
+  }
 
   @media (max-width: 767px) {
-    .hero { min-height: 620px; padding: 48px 20px; }
+    .hero { min-height: min(100svh, 620px); padding: 48px 20px 72px; border-bottom-left-radius: 50% 48px; border-bottom-right-radius: 50% 48px; }
     h1 { font-size: var(--text-3xl); }
     .lede { font-size: var(--text-base); }
-    .hero :global(.mark-c) { display: none; }
+    .bg-video { object-position: 50% 38%; }
   }
 </style>

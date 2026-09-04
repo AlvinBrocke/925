@@ -39,18 +39,40 @@
 --accent-active:var(--teal-600);
 --accent-contrast:#00120f;
 
---font-display:'Orbitron',sans-serif;
---font-body:'Rajdhani',sans-serif;
---font-mono:'Share Tech Mono',monospace;
+--font-display:'Archivo Variable',sans-serif;
+--font-body:'Inter Variable',sans-serif;
+--font-mono:'JetBrains Mono Variable',monospace;
 
+/* Archivo has a taller x-height and a much narrower set width than Orbitron,
+   so the old 72/104px ceiling reads oversized once it's a real grotesque
+   instead of a geometric display face. Sized down at the top of the ramp;
+   xs-lg are unchanged since Inter/JetBrains sit close to Rajdhani/Share Tech
+   Mono in x-height at those sizes. */
 --text-xs:12px;  --text-sm:14px;  --text-base:16px; --text-md:18px;
---text-lg:22px;  --text-xl:28px;  --text-2xl:36px;  --text-3xl:48px;
---text-4xl:72px; --text-5xl:104px;
+--text-lg:22px;  --text-xl:28px;  --text-2xl:36px;  --text-3xl:44px;
+--text-4xl:64px; --text-5xl:88px;
 
---tracking-tight:-0.01em; --tracking-normal:0;    --tracking-wide:0.04em;
---tracking-wider:0.12em;  --tracking-widest:0.24em;
+/* Orbitron/Rajdhani/Share Tech Mono are wide, geometric faces that needed air
+   to keep from clumping; Archivo/Inter/JetBrains Mono are normal-width and
+   clump at the old values instead of just looking dense. Every value below is
+   reworked for the new faces, not carried over:
+   - tight flips negative: a big Archivo display headline (--text-4xl/5xl)
+     wants -0.02em to close up the counters instead of the old -0.01em, which
+     was tuned for Orbitron's already-open forms.
+   - wide/wider are roughly halved: nav links, buttons and uppercase
+     sub-headings set in Archivo at 13-18px looked airy at 0.04/0.12em and
+     now read as loose gaps between normal-width letterforms.
+   - widest is cut by nearly half and reserved for the smallest all-caps
+     JetBrains Mono labels (the hero eyebrow); monospace letterforms are
+     already evenly spaced, so they need much less added tracking than
+     Share Tech Mono did to read as intentional rather than sci-fi. */
+--tracking-tight:-0.02em; --tracking-normal:0;    --tracking-wide:0.02em;
+--tracking-wider:0.05em;  --tracking-widest:0.13em;
 
---leading-tight:1.05; --leading-normal:1.4; --leading-relaxed:1.6;
+/* Archivo's cap-height/ascender profile is tighter than Orbitron's near-full-
+   em glyphs, so multi-line display headings can sit closer without collapsing
+   into their descenders. */
+--leading-tight:1.0; --leading-normal:1.4; --leading-relaxed:1.6;
 
 --space-1:4px;  --space-2:8px;  --space-3:12px; --space-4:16px; --space-5:24px;
 --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px; --space-10:128px;
@@ -63,6 +85,13 @@
 --shadow-hairline:inset 0 0 0 1px var(--border-hairline);
 
 --ease-standard:cubic-bezier(.4,0,.2,1);
+/* A long, late-braking decelerate (expo-out). --ease-standard is the Material
+   curve and is right for a 120-220ms state change on a control; it is too
+   eager over the 700ms+ a section reveal takes, where it reads as "arrived"
+   before it has settled. This one covers most of its distance early and eases
+   out for a long time, which is what makes a slow move feel weighted rather
+   than slow. */
+--ease-out-soft:cubic-bezier(.16,1,.3,1);
 --duration-fast:120ms;
 --duration-base:220ms;
 }
