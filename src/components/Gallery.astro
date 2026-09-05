@@ -7,7 +7,7 @@ import { galleryPhotos, galleryCredit } from '../data/gallery';
  * first shift.
  *
  * Zero JavaScript, by design. The README is explicit that only Countdown and
- * ClockInDialog ship JS, so this is a CSS marquee: the same eight photos are
+ * RsvpForm ship JS, so this is a CSS marquee: the same eight photos are
  * rendered twice and the track is translated by exactly -50%, which lands the
  * duplicate set precisely where the original started. At that instant the
  * animation restarts from 0 and the two frames are pixel-identical, so there is
@@ -62,10 +62,10 @@ const passes = [{ duplicate: false }, { duplicate: true }];
               <Image
                 src={photo.image}
                 alt={pass.duplicate ? '' : photo.alt}
-                width={480}
-                height={640}
-                widths={[640]}
-                sizes="(max-width: 640px) 200px, 260px"
+                width={720}
+                height={960}
+                widths={[480, 720, 960]}
+                sizes="(max-width: 640px) 335px, 440px"
                 quality={68}
                 loading="lazy"
                 decoding="sync"
@@ -90,7 +90,13 @@ const passes = [{ duplicate: false }, { duplicate: true }];
 </section>
 
 <style>
-  .gallery { position: relative; padding: 70px 0; }
+  .gallery {
+    position: relative; padding: 70px 0;
+    background-color: var(--near-black);
+    background-image: var(--noise-image);
+    background-repeat: repeat;
+    background-size: var(--noise-size) var(--noise-size);
+  }
   .head { padding: 0 40px; margin-bottom: 30px; }
   .eyebrow {
     font-family: var(--font-mono); font-size: 11px; color: var(--teal);
@@ -108,7 +114,7 @@ const passes = [{ duplicate: false }, { duplicate: true }];
      -50% translate depends on. */
   .strip {
     --u: 1px;
-    --gap: calc(18 * var(--u));
+    --gap: calc(28 * var(--u));
     position: relative;
     overflow: hidden;
     padding: calc(30 * var(--u)) 0;
@@ -151,19 +157,19 @@ const passes = [{ duplicate: false }, { duplicate: true }];
      cycle is eight, matching the set length, so a card and its duplicate are
      always identical — a different tilt across the loop point would show up as
      a jump. */
-  .shot:nth-child(1) { --w: 248; --h: 330; --rot: -3.2deg; }
-  .shot:nth-child(2) { --w: 216; --h: 288; --rot:  2.4deg; }
-  .shot:nth-child(3) { --w: 272; --h: 356; --rot: -1.4deg; }
-  .shot:nth-child(4) { --w: 232; --h: 310; --rot:  4.1deg; }
-  .shot:nth-child(5) { --w: 258; --h: 340; --rot: -4.6deg; }
-  .shot:nth-child(6) { --w: 224; --h: 296; --rot:  1.8deg; }
-  .shot:nth-child(7) { --w: 268; --h: 348; --rot: -2.2deg; }
-  .shot:nth-child(8) { --w: 240; --h: 318; --rot:  3.6deg; }
+  .shot:nth-child(1) { --w: 400; --h: 530; --rot: -3.2deg; }
+  .shot:nth-child(2) { --w: 345; --h: 460; --rot:  2.4deg; }
+  .shot:nth-child(3) { --w: 435; --h: 570; --rot: -1.4deg; }
+  .shot:nth-child(4) { --w: 370; --h: 495; --rot:  4.1deg; }
+  .shot:nth-child(5) { --w: 415; --h: 545; --rot: -4.6deg; }
+  .shot:nth-child(6) { --w: 360; --h: 475; --rot:  1.8deg; }
+  .shot:nth-child(7) { --w: 430; --h: 555; --rot: -2.2deg; }
+  .shot:nth-child(8) { --w: 385; --h: 510; --rot:  3.6deg; }
 
   /* Short washes so the cards dissolve into the page instead of being sliced
      off by the viewport edge. */
   .fade {
-    position: absolute; top: 0; bottom: 0; width: 88px;
+    position: absolute; top: 0; bottom: 0; width: 130px;
     pointer-events: none;
   }
   .fade-l { left: 0;  background: linear-gradient(90deg, var(--black), transparent); }
@@ -183,7 +189,7 @@ const passes = [{ duplicate: false }, { duplicate: true }];
     .head { padding: 0 20px; }
     .credit { padding: 22px 20px 0; }
     .strip { --u: 0.76px; }
-    .fade { width: 44px; }
+    .fade { width: 64px; }
   }
 
   /* The global reduced-motion rule collapses animations to ~0s, which would

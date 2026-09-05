@@ -31,12 +31,12 @@ Every page is static HTML. Only two components ship JavaScript:
 | Island | Directive | Why |
 |---|---|---|
 | `Countdown.tsx` | `client:load` | Above the fold, must tick immediately |
-| `ClockInDialog.tsx` | `client:idle` | Nobody opens it in the first 200ms |
+| `RsvpForm.tsx` | `client:visible` | Below the fold, in the CTA section only |
 
-The four "Clock In" buttons are **not** islands. They are static HTML with a
-`data-clock-in` attribute; one delegated listener in `Base.astro` dispatches a
-window event that the single dialog island listens for. Hydrating four React
-buttons to open one dialog would have meant shipping React to four places.
+`RsvpForm` renders inline in the "Get The Drop First" CTA section — the one
+place on the page the RSVP form lives. The Header and Hero "Clock In" buttons
+are plain anchor links (`href="#manifesto"`) that scroll down to it, not
+islands themselves.
 
 ## The location gate
 
@@ -67,7 +67,7 @@ src/
 │   ├── ds/          Design system primitives, ported from the Claude Design project
 │   ├── *.astro      Static sections — zero JS
 │   ├── Countdown.tsx      island
-│   └── ClockInDialog.tsx  island
+│   └── RsvpForm.tsx       island
 ├── data/
 │   ├── shift.ts     Next shift. Doors time and reveal window — no address
 │   └── events.ts    Shift log entries

@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import ChromeField from './ChromeField.astro';
 import { nextShift } from '../data/shift';
 import { PASSA_CHECKOUT_URL, PASSA_DROP_URL, formatPrice, tiers } from '../data/tickets';
@@ -42,6 +43,7 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
             target={tier.soldOut ? undefined : '_blank'}
             rel={tier.soldOut ? undefined : 'noopener noreferrer'}
           >
+            {tier.icon && <Image src={tier.icon} alt="" width={56} height={56} class="tier-icon" />}
             <span class="grade">{tier.soldOut ? 'Position Filled' : tier.label}</span>
             <span class="name">{tier.name}</span>
             <span class="price">{formatPrice(tier)}</span>
@@ -57,10 +59,10 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
       <a class="btn btn-primary" href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
         Get Tickets
       </a>
-      <p class="note">
-        Checkout is handled by <a href={PASSA_DROP_URL} target="_blank" rel="noopener noreferrer">Passa</a>,
-        where prices and availability are live. All tickets non-refundable.
+      <p class="powered-by">
+        Powered by <a href={PASSA_DROP_URL} target="_blank" rel="noopener noreferrer" class="passa-wordmark">passa</a>
       </p>
+      <p class="note">Checkout happens on Passa, where prices and availability are live. All tickets non-refundable.</p>
     </div>
   </div>
 </section>
@@ -69,7 +71,13 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
   /* clip, not hidden: `hidden` would make this section a scroll container and
      every view()-driven reveal inside it would be measured against a box that
      never scrolls. Clips identically. */
-  .tickets { padding: 70px 40px; position: relative; overflow: clip; }
+  .tickets {
+    padding: 110px 40px; position: relative; overflow: clip;
+    background-color: var(--near-black);
+    background-image: var(--noise-image);
+    background-repeat: repeat;
+    background-size: var(--noise-size) var(--noise-size);
+  }
   .inner { position: relative; z-index: 1; }
 
   .head { text-align: center; display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: 36px; }
@@ -78,21 +86,21 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
     letter-spacing: var(--tracking-widest); color: var(--teal); text-transform: uppercase;
   }
   h2 {
-    font-family: var(--font-display); font-size: var(--text-xl);
+    font-family: var(--font-display); font-size: var(--text-2xl);
     text-transform: uppercase; letter-spacing: var(--tracking-wide);
   }
   .when {
-    font-family: var(--font-mono); font-size: 13px; color: var(--chrome-500);
+    font-family: var(--font-mono); font-size: 14px; color: var(--chrome-500);
     letter-spacing: var(--tracking-wide); text-transform: uppercase;
   }
 
   .grid {
-    list-style: none; display: grid; gap: 18px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    list-style: none; display: grid; gap: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   }
   .tier {
     display: flex; flex-direction: column; gap: 6px; height: 100%;
-    padding: 22px 20px 20px; text-decoration: none;
+    padding: 32px 28px 28px; text-decoration: none;
     background: var(--surface-raised); border: 1px solid var(--border-hairline);
     border-radius: var(--radius-md);
     transition: border-color var(--duration-base) var(--ease-standard),
@@ -102,19 +110,20 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
   a.tier:hover, a.tier:focus-visible {
     border-color: var(--teal); box-shadow: var(--shadow-glow-sm); translate: 0 -2px;
   }
+  .tier-icon { width: 56px; height: 56px; object-fit: contain; margin-bottom: 8px; }
   .grade {
-    font-family: var(--font-mono); font-size: 11px; color: var(--teal);
+    font-family: var(--font-mono); font-size: 13px; color: var(--teal);
     letter-spacing: var(--tracking-wide); text-transform: uppercase;
   }
   .name {
-    font-family: var(--font-display); font-weight: 700; font-size: var(--text-md);
+    font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg);
     color: var(--chrome-100); text-transform: uppercase; letter-spacing: var(--tracking-wide);
   }
   .price {
-    font-family: var(--font-mono); font-size: var(--text-lg); color: var(--chrome-100);
+    font-family: var(--font-mono); font-size: var(--text-2xl); color: var(--chrome-100);
     letter-spacing: var(--tracking-wide); margin-top: var(--space-2);
   }
-  .admits { font-family: var(--font-body); font-size: 13px; color: var(--chrome-500); }
+  .admits { font-family: var(--font-body); font-size: 14px; color: var(--chrome-500); }
   .pick {
     font-family: var(--font-display); font-weight: 700; font-size: 13px;
     letter-spacing: var(--tracking-wider); text-transform: uppercase;
@@ -142,13 +151,25 @@ const hourLine = `${hour(nextShift.doorsAt)}–${hour(nextShift.endsAt)}`;
   }
   .btn-primary { background: var(--accent); color: var(--accent-contrast); box-shadow: var(--shadow-glow-sm); }
   .btn-primary:hover { background: var(--accent-hover); }
+  .powered-by {
+    font-family: var(--font-mono); font-size: 12px; color: var(--chrome-500);
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  /* Passa's own wordmark is lowercase and unadorned (confirmed from their live
+     site) — deliberately not this site's always-uppercase display/mono type,
+     so the credit reads as a nod to their real mark rather than a native one. */
+  .passa-wordmark {
+    font-family: var(--font-body); font-weight: 500; text-transform: lowercase;
+    font-size: 16px; letter-spacing: 0; color: var(--chrome-100); text-decoration: none;
+  }
+  .passa-wordmark:hover { color: var(--teal); }
   .note { font-size: 13px; color: var(--chrome-500); max-width: 420px; }
-  .note a { color: var(--chrome-300); }
-  .note a:hover { color: var(--teal); }
 
   @media (max-width: 767px) {
-    .tickets { padding: 48px 20px; }
-    .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .tier { padding: 18px 16px 16px; }
+    .tickets { padding: 64px 20px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .tier { padding: 22px 18px 18px; }
+    .tier-icon { width: 40px; height: 40px; }
   }
 </style>

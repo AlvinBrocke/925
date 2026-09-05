@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 interface Props {
   /** ISO 8601 instant the address unlocks. */
@@ -92,37 +92,36 @@ export default function Countdown({ revealAt }: Props) {
     // 3+1 on a narrow phone — which reads as a bug, not a choice — and an inline
     // style can't carry the media query that turns them into a 2x2.
     <div className="cd-grid">
-      {split(remaining).map((u) => (
-        <div key={u.label} style={{
-          background: 'var(--charcoal)', border: '1px solid var(--border-hairline)',
-          borderRadius: 'var(--radius-md)', padding: '16px 22px', minWidth: '88px',
-          textAlign: 'center', boxShadow: '0 0 20px #00d2c333',
-        }}>
-          {/* The page is prerendered, so the server bakes in the value as of BUILD
-              time while the client renders the value as of NOW. Those can never
-              match, and without this React treats it as a hydration failure
-              (error #418), throws away the server HTML for this subtree and logs
-              in production. The mismatch is intentional here, so declare it. */}
-          <div
-            suppressHydrationWarning={!u.roll}
-            style={{
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-2xl)',
-              color: 'var(--teal)', textShadow: '0 0 14px var(--teal-glow)',
-            }}
-          >
-            {u.roll
-              ? [...u.value].map((c, i) => <RollingDigit key={i} char={c} />)
-              : u.value}
+      {split(remaining).map((u, i) => (
+        <Fragment key={u.label}>
+          <div style={{ textAlign: 'center' }}>
+            {/* The page is prerendered, so the server bakes in the value as of BUILD
+                time while the client renders the value as of NOW. Those can never
+                match, and without this React treats it as a hydration failure
+                (error #418), throws away the server HTML for this subtree and logs
+                in production. The mismatch is intentional here, so declare it. */}
+            <div
+              suppressHydrationWarning={!u.roll}
+              style={{
+                fontFamily: 'var(--font-mono)', fontSize: 'clamp(56px, 11vw, 150px)',
+                lineHeight: 1, color: 'var(--chrome-100)', textShadow: '0 2px 24px #00000080',
+              }}
+            >
+              {u.roll
+                ? [...u.value].map((c, idx) => <RollingDigit key={idx} char={c} />)
+                : u.value}
+            </div>
+            {/* Mono, matching the digits above: the reference treats the whole
+                countdown as one block rather than two typefaces stacked. */}
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: 'clamp(10px, 1.2vw, 13px)',
+              letterSpacing: 'var(--tracking-wider)', color: 'var(--chrome-500)', marginTop: '4px',
+            }}>
+              {u.label}
+            </div>
           </div>
-          {/* Mono, matching the digits above: the reference treats the whole
-              countdown as one block rather than two typefaces stacked. */}
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '10px',
-            letterSpacing: 'var(--tracking-wider)', color: 'var(--chrome-500)', marginTop: '4px',
-          }}>
-            {u.label}
-          </div>
-        </div>
+          {i < 3 && <span className="cd-colon" aria-hidden="true">:</span>}
+        </Fragment>
       ))}
     </div>
   );

@@ -1,5 +1,6 @@
 ---
 import ChromeField from './ChromeField.astro';
+import RsvpForm from './RsvpForm';
 import { nextShift } from '../data/shift';
 import { PASSA_CHECKOUT_URL } from '../data/tickets';
 ---
@@ -14,13 +15,13 @@ import { PASSA_CHECKOUT_URL } from '../data/tickets';
       Location drops {nextShift.revealHoursBefore}hrs before doors. Clock in to
       get it before anyone else.
     </p>
-    <button class="btn-primary" data-clock-in>Clock In</button>
+    <RsvpForm client:visible />
     <!-- The last block on the page is the last chance to sell a ticket, but the
          address list is what this section is for — so tickets go out as a link,
          not a second primary button competing with the one above it. -->
     <p class="also">
       No ticket yet?
-      <a href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">Get yours on Passa →</a>
+      <a href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer"> Get yours on Passa →</a>
     </p>
   </div>
 </section>
@@ -30,7 +31,10 @@ import { PASSA_CHECKOUT_URL } from '../data/tickets';
     /* clip, not hidden: `hidden` would make this a scroll
        container and swallow the view() timeline of the reveal inside it. */
     position: relative; padding: 70px 40px; overflow: clip;
-    background: linear-gradient(180deg, #000, var(--duotone-green-deep) 60%, #000);
+    background-color: #000;
+    background-image: var(--noise-image), linear-gradient(180deg, #000, var(--duotone-green-deep) 60%, #000);
+    background-repeat: repeat, no-repeat;
+    background-size: var(--noise-size) var(--noise-size), auto;
   }
   /* Subtle teal wash behind the block, lifted from the reference site. It sits
      over the section gradient and under the content. */
@@ -49,15 +53,6 @@ import { PASSA_CHECKOUT_URL } from '../data/tickets';
     text-transform: uppercase; letter-spacing: var(--tracking-wide);
   }
   p { color: var(--chrome-300); font-size: 15px; }
-  .btn-primary {
-    font-family: var(--font-display); font-weight: 700; font-size: 15px;
-    letter-spacing: var(--tracking-wider); text-transform: uppercase;
-    padding: 12px 24px; border: 1px solid transparent; border-radius: var(--radius-sm);
-    background: var(--accent); color: var(--accent-contrast);
-    box-shadow: var(--shadow-glow-sm); cursor: pointer;
-    transition: all var(--duration-base) var(--ease-standard);
-  }
-  .btn-primary:hover { background: var(--accent-hover); }
   .also {
     font-family: var(--font-mono); font-size: 13px; color: var(--chrome-500);
     letter-spacing: var(--tracking-wide);

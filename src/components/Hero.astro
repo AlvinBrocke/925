@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import ChromeField from './ChromeField.astro';
 import Countdown from './Countdown';
 import { nextShift, revealAt } from '../data/shift';
@@ -48,14 +49,16 @@ const opensAt = revealAt(nextShift).toISOString();
       <a class="btn btn-primary" href={PASSA_CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
         Get Tickets
       </a>
-      <button class="btn btn-ghost" data-clock-in>Clock In</button>
+      <a class="btn btn-ghost" href="#manifesto">Clock In</a>
     </div>
 
     <!-- "@925" was never a real handle — nobody could tap it and land
          anywhere. These do. -->
     <div class="socials">
       {socials.map((s) => (
-        <a href={s.href} aria-label={s.name} rel="me noopener">{s.label}</a>
+        <a href={s.href} aria-label={s.name} rel="me noopener">
+          <Image src={s.icon} alt="" width={22} height={22} />
+        </a>
       ))}
     </div>
   </div>
@@ -106,11 +109,12 @@ const opensAt = revealAt(nextShift).toISOString();
     font-family: var(--font-display); font-weight: 900; font-size: var(--text-5xl);
     line-height: .95; letter-spacing: var(--tracking-tight);
   }
-  /* Two-tone: the first line is polished metal, the second is the brand accent. */
+  /* Two-tone: the first line is polished metal, the second is the brand accent.
+     Flat fill plus a bevel shadow reads as metal without the banding a
+     multi-stop gradient fill left behind. */
   .chrome-word {
-    background: linear-gradient(180deg, #ffffff 0%, var(--chrome-300) 34%, var(--chrome-500) 54%, #ffffff 72%, var(--chrome-500) 100%);
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent;
+    color: var(--chrome-100);
+    text-shadow: 0 1px 0 #ffffffcc, 0 -1px 1px #00000066, 0 2px 22px #00000080;
   }
   .teal-word { color: var(--teal); text-shadow: 0 0 44px var(--teal-glow); }
   .lede { font-size: var(--text-md); color: var(--chrome-300); max-width: 520px; }
@@ -130,11 +134,11 @@ const opensAt = revealAt(nextShift).toISOString();
   .socials a {
     width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
     border: 1px solid var(--border-hairline); border-radius: var(--radius-sm);
-    color: var(--chrome-500); text-decoration: none; font-family: var(--font-mono); font-size: 11px;
-    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
     transition: all var(--duration-fast) var(--ease-standard);
   }
-  .socials a:hover { border-color: var(--teal); color: var(--teal); }
+  .socials a :global(img) { display: block; }
+  .socials a:hover { border-color: var(--teal); filter: drop-shadow(0 0 6px var(--teal-glow)); }
 
   /* The headline lags the page. Scrolling moves the hero up by S while this
      block is pushed back down by ~0.25S, so it drifts out of frame slower than
@@ -166,6 +170,7 @@ const opensAt = revealAt(nextShift).toISOString();
 
   @media (max-width: 767px) {
     .hero { min-height: min(100svh, 620px); padding: 48px 20px 72px; border-bottom-left-radius: 50% 48px; border-bottom-right-radius: 50% 48px; }
+    .content { gap: var(--space-4); }
     h1 { font-size: var(--text-3xl); }
     .lede { font-size: var(--text-base); }
     .bg-video { object-position: 50% 38%; }

@@ -6,7 +6,6 @@ import Tickets from '../components/Tickets.astro';
 import Gallery from '../components/Gallery.astro';
 import Newsletter from '../components/Newsletter.astro';
 import Footer from '../components/Footer.astro';
-import ClockInDialog from '../components/ClockInDialog';
 import { nextShift } from '../data/shift';
 import { CURRENCY, PASSA_CHECKOUT_URL, ticketsAvailable, tiers } from '../data/tickets';
 
@@ -49,10 +48,6 @@ const eventSchema = {
     <Newsletter />
   </main>
   <Footer />
-
-  <!-- client:idle — nobody opens the dialog in the first 200ms, so it waits
-       until the main thread is free rather than competing with first paint. -->
-  <ClockInDialog client:idle />
 
   <script type="application/ld+json" is:inline set:html={JSON.stringify(eventSchema)} />
 </Base>

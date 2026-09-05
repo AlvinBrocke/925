@@ -28,6 +28,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://925.example
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#000000" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -42,20 +45,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://925.example
 
     <slot />
 
-    <!-- The only inline script on the page. Three jobs, all delegated or
-         page-wide so nothing here scales with the number of elements:
-         the Clock In buttons, the reveal-on-scroll observer, and the hero
-         video. Keeping them in one module is what keeps the site at two
-         hydrated React islands and no third bundle. -->
+    <!-- The only inline script on the page. Two jobs, both delegated or
+         page-wide so nothing here scales with the number of elements: the
+         reveal-on-scroll observer and the hero video. Keeping them in one
+         module is what keeps the site at two hydrated React islands and no
+         third bundle. -->
     <script>
-      // Every static "Clock In" button dispatches one event; the single React
-      // dialog island listens for it. This is what keeps four call-to-action
-      // buttons at zero hydration.
-      document.addEventListener('click', (e) => {
-        const trigger = (e.target as HTMLElement)?.closest('[data-clock-in]');
-        if (trigger) window.dispatchEvent(new CustomEvent('clock-in:open'));
-      });
-
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // --- Reveal on scroll ------------------------------------------------

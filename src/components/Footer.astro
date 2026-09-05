@@ -1,15 +1,35 @@
 ---
 import ChromeField from './ChromeField.astro';
+import { Image } from 'astro:assets';
 import { socials } from '../data/socials';
+import { nextShift } from '../data/shift';
+// Drop the file at src/assets/sponsors/pan-afrique-airlines-white.png (already
+// present), then this import + the <Image> below are already wired to use it.
+import panAfriqueLogo from '../assets/sponsors/pan-afrique-airlines-white.png';
 const year = new Date().getFullYear();
+const CONTACT_EMAIL = 'the925experi3nce@gmail.com';
 ---
 <footer class="foot">
   <ChromeField field="footer" />
-  <p class="mark" data-reveal>© {year} 925 — THE SHIFT CONTINUES</p>
-  <div class="social" data-reveal style="--reveal-i:1">
-    {socials.map((s) => (
-      <a href={s.href} aria-label={s.name} rel="me noopener">{s.label}</a>
-    ))}
+  <div class="row" data-reveal>
+    <p class="mark">© {year} 925 — THE SHIFT CONTINUES</p>
+    <div class="social">
+      {socials.map((s) => (
+        <a href={s.href} aria-label={s.name} rel="me noopener">
+          <Image src={s.icon} alt="" width={22} height={22} />
+        </a>
+      ))}
+    </div>
+  </div>
+  <div class="row" data-reveal style="--reveal-i:1">
+    <a class="email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+    <!-- Venue name only — never the street address, which is deliberately
+         gated behind the countdown/RSVP reveal (see src/data/shift.ts). -->
+    <p class="venue">{nextShift.venue}</p>
+  </div>
+  <div class="row row-sponsors" data-reveal style="--reveal-i:2">
+    <span class="sponsor-label">Sponsors</span>
+    <Image src={panAfriqueLogo} alt="Pan Afrique Airlines" height={40} width={375} class="sponsor-logo" />
   </div>
 </footer>
 
@@ -18,19 +38,48 @@ const year = new Date().getFullYear();
     /* clip, not hidden — see Tickets.astro, which has the full rationale. */
     position: relative; overflow: clip; padding: 40px;
     border-top: 1px solid var(--border-hairline);
-    display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+    display: flex; flex-direction: column; gap: var(--space-4);
+    background-color: var(--near-black);
+    background-image: var(--noise-image);
+    background-repeat: repeat;
+    background-size: var(--noise-size) var(--noise-size);
+  }
+  .row {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-5); flex-wrap: wrap;
   }
   .mark {
-    position: relative; z-index: 1; font-family: var(--font-mono);
+    font-family: var(--font-mono);
     font-size: var(--text-xs); color: var(--chrome-700); letter-spacing: var(--tracking-wide);
   }
-  .social { position: relative; z-index: 1; display: flex; gap: 12px; }
+  .social { display: flex; gap: 12px; }
   .social a {
     width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
     border: 1px solid var(--border-hairline); border-radius: var(--radius-sm);
-    color: var(--chrome-300); text-decoration: none; font-family: var(--font-mono); font-size: 13px;
+    text-decoration: none;
     transition: all var(--duration-fast) var(--ease-standard);
   }
-  .social a:hover { border-color: var(--teal); color: var(--teal); }
-  @media (max-width: 767px) { .foot { padding: 32px 20px; } }
+  .social a :global(img) { display: block; }
+  .social a:hover { border-color: var(--teal); filter: drop-shadow(0 0 6px var(--teal-glow)); }
+  .email {
+    font-family: var(--font-mono); font-size: 12px; color: var(--chrome-300);
+    text-decoration: none; letter-spacing: var(--tracking-wide);
+  }
+  .email:hover { color: var(--teal); }
+  .venue {
+    font-family: var(--font-mono); font-size: 12px; color: var(--chrome-500);
+    text-transform: uppercase; letter-spacing: var(--tracking-wide);
+  }
+  .row-sponsors { border-top: 1px solid var(--border-hairline); padding-top: var(--space-4); }
+  .sponsor-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--chrome-700);
+    text-transform: uppercase; letter-spacing: var(--tracking-widest);
+  }
+  .sponsor-logo { display: block; height: 40px; width: auto; object-fit: contain; opacity: .85; }
+  @media (max-width: 767px) {
+    .foot { padding: 32px 20px; }
+    .row { justify-content: center; text-align: center; }
+    .row-sponsors { flex-direction: column; gap: var(--space-2); }
+  }
 </style>

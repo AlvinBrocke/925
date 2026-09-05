@@ -140,9 +140,18 @@ a{color:inherit}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
 
-/* Countdown chips. Four across on desktop; below 520px they wrap 3+1, which
-   reads as a layout bug rather than a decision, so they become a 2x2 instead. */
-.cd-grid{display:flex;gap:var(--space-4);flex-wrap:wrap;justify-content:center}
+/* Countdown. One row at every width — the digits and colon shrink
+   continuously via clamp() instead of the old boxed chips reflowing into a
+   2x2 grid, which is what let them get away with a fixed font-size. */
+.cd-grid{display:flex;align-items:flex-end;gap:clamp(6px,1.5vw,20px);justify-content:center}
+.cd-colon{
+  font-family:var(--font-mono);color:var(--chrome-500);line-height:1;
+  font-size:clamp(40px,8vw,110px);
+  /* Offsets the label row below each digit stack so the glyph optically
+     centers on the numerals, not on the whole (digit + label) unit. */
+  padding-bottom:clamp(14px,2vw,26px);
+}
 @media (max-width:520px){
-  .cd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-width:320px;margin-inline:auto}
+  .cd-grid{gap:clamp(4px,2vw,10px)}
+  .cd-colon{font-size:clamp(24px,7vw,40px);padding-bottom:10px}
 }

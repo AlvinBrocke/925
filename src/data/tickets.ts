@@ -8,6 +8,10 @@
  *  a new one opens on Passa, edit this file too. The board carries a line
  *  saying Passa is authoritative, so a tier that goes stale for an afternoon
  *  reads as out of date rather than as a broken promise. */
+import type { ImageMetadata } from 'astro';
+import tierMedal from '../assets/icons/tiers/tier-medal.png';
+import tierDiamond from '../assets/icons/tiers/tier-diamond.png';
+
 export interface Tier {
   name: string;
   /** Passa's own bracket text — "Phase 2", "Group Ticket". Carried rather than
@@ -21,6 +25,8 @@ export interface Tier {
   admits: number;
   /** Sold-out tiers stay on the board: the ladder is the pitch. */
   soldOut?: boolean;
+  /** Chrome badge image for this rung of the ladder. */
+  icon?: ImageMetadata;
 }
 
 export const PASSA_DROP_URL = 'https://passa.live/drop/925-the-shift-continues';
@@ -33,10 +39,10 @@ export const PASSA_CHECKOUT_URL = `${PASSA_DROP_URL}/checkout`;
 export const CURRENCY = 'GHS';
 
 export const tiers: Tier[] = [
-  { name: 'The Intern', label: 'Early Bird', price: 85, admits: 1, soldOut: true },
-  { name: 'NSS Employee', label: 'Phase 1', price: 100, admits: 1, soldOut: true },
-  { name: 'Senior Associate', label: 'Phase 2', price: 120, admits: 1 },
-  { name: 'HR Department', label: 'Group Ticket', price: 300, admits: 3 },
+  { name: 'The Intern', label: 'Early Bird', price: 85, admits: 1, soldOut: true, icon: tierMedal },
+  { name: 'NSS Employee', label: 'Phase 1', price: 100, admits: 1, soldOut: true, icon: tierMedal },
+  { name: 'Senior Associate', label: 'Phase 2', price: 120, admits: 1, icon: tierDiamond },
+  { name: 'HR Department', label: 'Group Ticket', price: 300, admits: 3, icon: tierDiamond },
 ];
 
 export const ticketsAvailable = tiers.some((t) => !t.soldOut);
